@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def monte_carlo_call(
+def monte_carlo_call( 
     S,
     K,
     r,
@@ -12,40 +12,16 @@ def monte_carlo_call(
 ):
     """
     Price a European call option using Monte Carlo simulation.
-
-    Parameters
-    ----------
-    S : float
-        Initial stock price.
-    K : float
-        Strike price.
-    r : float
-        Risk-free interest rate.
-    sigma : float
-        Volatility.
-    T : float
-        Time to maturity.
-    n_paths : int
-        Number of Monte Carlo paths.
-    seed : int, optional
-        Random seed for reproducibility.
-
-    Returns
-    -------
-    price : float
-        Monte Carlo estimate of the option price.
-    standard_error : float
-        Standard error of the Monte Carlo estimate.
     """
 
-    rng = np.random.default_rng(seed)
-
-    Z = rng.standard_normal(n_paths)
-
-    drift = (r - 0.5 * sigma**2) * T
-    diffusion = sigma * np.sqrt(T) * Z
-
-    ST = S * np.exp(drift + diffusion)
+    ST = simulate_terminal_prices(
+        S=S,
+        r=r,
+        sigma=sigma,
+        T=T,
+        n_paths=n_paths,
+        seed=seed,
+    )
 
     payoff = np.maximum(ST - K, 0)
 
@@ -60,3 +36,16 @@ def monte_carlo_call(
     )
 
     return price, standard_error
+
+
+
+def simulate_terminal_prices(S, r, sigma, T, n_paths, seed=None):
+    """
+    Simulate terminal stock prices using geometric Brownian motion.
+    """
+    rng = np.random.default_rng(seed)
+    Z = rng.standard_normal(n_paths)
+    drift = (r - 0.5 * sigma**2) * T
+    diffusion = sigma * np.sqrt(T) * Z
+    ST = S * np.exp(drift + diffusion)
+    return ST
