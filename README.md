@@ -134,7 +134,7 @@ Monte Carlo simulation estimates the expectation by generating a large number of
 # 2. Geometric Brownian Motion
 
 The underlying asset is modeled using the Black-Scholes stochastic differential equation:
-
+<img width="1593" height="1206" alt="Stockpricesimulation" src="https://github.com/user-attachments/assets/3bd84d6e-1e6d-4eb3-bd55-35ec9dca00fc" />
 ```math
 dS_t
 =
@@ -176,7 +176,7 @@ Z \sim N(0,1)
 This exact solution allows terminal prices to be simulated directly without discretizing the stochastic differential equation.
 
 ---
-<img width="1593" height="1206" alt="Stockpricesimulation" src="https://github.com/user-attachments/assets/3bd84d6e-1e6d-4eb3-bd55-35ec9dca00fc" />
+
 # 3. Monte Carlo Pricing
 
 Suppose $N$ independent terminal prices are simulated:
