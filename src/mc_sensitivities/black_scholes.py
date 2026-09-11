@@ -5,7 +5,7 @@ from scipy.stats import norm
 def _d1_d2(S, K, r, sigma, T):
     d1 = (
         np.log(S / K)
-        + (r + 0.5 * sigma**2) * T
+        + (r + 0.5 * sigma**2) * T #brownian motion drift term
     ) / (sigma * np.sqrt(T))
 
     d2 = d1 - sigma * np.sqrt(T)
