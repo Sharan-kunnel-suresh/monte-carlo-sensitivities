@@ -281,6 +281,7 @@ d_1-\sigma\sqrt{T}
 Here, $N(\cdot)$ denotes the cumulative distribution function of the standard normal distribution.
 
 The analytical Black-Scholes solution acts as a **benchmark** for evaluating Monte Carlo prices and sensitivity estimates.
+<img width="360" height="286" alt="image" src="https://github.com/user-attachments/assets/4f7a2724-0368-4f9d-85ad-fe5d124a1366" />
 
 ---
 
