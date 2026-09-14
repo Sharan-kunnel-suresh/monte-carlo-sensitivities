@@ -281,7 +281,11 @@ d_1-\sigma\sqrt{T}
 Here, $N(\cdot)$ denotes the cumulative distribution function of the standard normal distribution.
 
 The analytical Black-Scholes solution acts as a **benchmark** for evaluating Monte Carlo prices and sensitivity estimates.
-<img width="360" height="286" alt="image" src="https://github.com/user-attachments/assets/4f7a2724-0368-4f9d-85ad-fe5d124a1366" />
+<img width="360" height="286" alt="A European call valued using the Black–Scholes pricing equation for varying asset price 
+S
+{\displaystyle S} and time-to-expiry 
+T
+{\displaystyle T}. In this particular example, the strike price is set to 1. " src="https://github.com/user-attachments/assets/4f7a2724-0368-4f9d-85ad-fe5d124a1366" />
 
 ---
 
