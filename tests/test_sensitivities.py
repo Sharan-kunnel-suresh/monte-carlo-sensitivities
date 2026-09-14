@@ -1,7 +1,8 @@
 from src.mc_sensitivities.sensitivities import finite_difference_delta
+#testing finite difference delta function
 
 
-central, forward, backward = finite_difference_delta(
+central, forward, backward = finite_difference_delta(# doing for central, forwardx backward finite dfference delta
     S=100,
     K=100,
     r=0.05,

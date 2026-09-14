@@ -1,6 +1,5 @@
 import numpy as np
-
-from mc_sensitivities.monte_carlo import monte_carlo_call, simulate_terminal_prices_from_z
+from .monte_carlo import simulate_terminal_prices_from_z
 
 
 def finite_difference_delta(
@@ -14,64 +13,33 @@ def finite_difference_delta(
     seed=42,
 ):
     """
-    Estimate Delta using finite differences.
-
-    Uses common random numbers so that the same Monte Carlo
-    samples are used for S+h, S, and S-h.
+    Estimate Delta using finite differences with common random numbers.
     """
 
-    rng = np.random.default_rng(seed)
+    if S - h <= 0:
+        raise ValueError("S - h must be positive for GBM simulation.")
 
+    rng = np.random.default_rng(seed)
     Z = rng.standard_normal(n_paths)
 
-    ST_up = simulate_terminal_prices_from_z(
-        S=S + h,
-        r=r,
-        sigma=sigma,
-        T=T,
-        Z=Z,
-    )
+    # Terminal prices for S+h, S, S-h
+    ST_up = simulate_terminal_prices_from_z(S + h, r, sigma, T, Z)
+    ST_mid = simulate_terminal_prices_from_z(S,     r, sigma, T, Z)
+    ST_down = simulate_terminal_prices_from_z(S - h, r, sigma, T, Z)
 
-    ST = simulate_terminal_prices_from_z(
-        S=S,
-        r=r,
-        sigma=sigma,
-        T=T,
-        Z=Z,
-    )
-
-    ST_down = simulate_terminal_prices_from_z(
-        S=S - h,
-        r=r,
-        sigma=sigma,
-        T=T,
-        Z=Z,
-    )
-
+    # Payoffs
     payoff_up = np.maximum(ST_up - K, 0)
-    payoff = np.maximum(ST - K, 0)
+    payoff_mid = np.maximum(ST_mid - K, 0)
     payoff_down = np.maximum(ST_down - K, 0)
 
-    discount_factor = np.exp(-r * T)
+    discount = np.exp(-r * T)
 
-    price_up = discount_factor * np.mean(payoff_up)
-    price = discount_factor * np.mean(payoff)
-    price_down = discount_factor * np.mean(payoff_down)
+    price_up = discount * np.mean(payoff_up)
+    price_mid = discount * np.mean(payoff_mid)
+    price_down = discount * np.mean(payoff_down)
 
-    central_delta = (
-        price_up - price_down
-    ) / (2 * h)
-
-    forward_delta = (
-        price_up - price
-    ) / h
-
-    backward_delta = (
-        price - price_down
-    ) / h
-
-    return (
-        central_delta,
-        forward_delta,
-        backward_delta,
-    )
+    return {
+        "central": (price_up - price_down) / (2 * h),
+        "forward": (price_up - price_mid) / h,
+        "backward": (price_mid - price_down) / h,
+    }
