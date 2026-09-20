@@ -45,22 +45,35 @@ def finite_difference_delta(
     }
 
 
-def pathwise_delta(S, K, r, sigma, T, n_paths=100_000, seed=42):
+def pathwise_delta(S,K,r,sigma,T,n_paths=100_000,seed=42,):
     """
-    Estimate Delta using the pathwise method.
+    Estimate call Delta using the pathwise method.
     """
 
     rng = np.random.default_rng(seed)
+
     Z = rng.standard_normal(n_paths)
 
-    ST = simulate_terminal_prices_from_z(S, r, sigma, T, Z)
-    payoff = np.maximum(ST - K, 0)
+    ST = simulate_terminal_prices_from_z(
+        S,
+        r,
+        sigma,
+        T,
+        Z,
+    )
 
-    # Pathwise delta: 1 if ST > K else 0
-    pathwise_delta_values = (ST > K).astype(float)
+    # Indicator: 1 if the option finishes in-the-money, 0 otherwise
+    indicator = (ST > K).astype(float)
+
+    # Pathwise derivative:
+    # dH/dST * dST/dS
+    pathwise_delta_values = indicator * (ST / S)
 
     discount = np.exp(-r * T)
-    price = discount * np.mean(payoff)
-    delta_estimate = discount * np.mean(pathwise_delta_values)
+
+    delta_estimate = (
+        discount
+        * np.mean(pathwise_delta_values)
+    )
 
     return delta_estimate

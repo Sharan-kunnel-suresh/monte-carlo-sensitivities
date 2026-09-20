@@ -1,18 +1,30 @@
-from src.mc_sensitivities.sensitivities import finite_difference_delta
-#testing finite difference delta function
+import numpy as np
+
+from src.mc_sensitivities.sensitivities import pathwise_delta
 
 
-central, forward, backward = finite_difference_delta(# doing for central, forwardx backward finite dfference delta
-    S=100,
-    K=100,
-    r=0.05,
-    sigma=0.20,
-    T=1.0,
-    h=1e-4,
-    n_paths=100_000,
-    seed=42,
-)
+S = 100
+K = 100
+r = 0.05
+sigma = 0.20
+T = 1.0
 
-print("Central Delta:", central)
-print("Forward Delta:", forward)
-print("Backward Delta:", backward)
+
+def test_pathwise_delta_is_close_to_black_scholes():
+    delta = pathwise_delta(
+        S=S,
+        K=K,
+        r=r,
+        sigma=sigma,
+        T=T,
+        n_paths=100_000,
+        seed=42,
+    )
+
+    black_scholes_delta = 0.6368306512
+
+    assert np.isclose(
+        delta,
+        black_scholes_delta,
+        atol=4e-3,
+    )

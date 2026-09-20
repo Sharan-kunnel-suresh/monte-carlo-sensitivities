@@ -171,8 +171,8 @@ Z \sim N(0,1)
 This exact solution allows terminal prices to be simulated directly without discretizing the stochastic differential equation.
 
 ---
-<img width="1321" height="1000" alt="image" src="https://github.com/user-attachments/assets/97aca61f-7778-4d88-9bb0-f48721f94cc3" />
 
+<img width="1321" height="1000" alt="image" src="https://github.com/user-attachments/assets/97aca61f-7778-4d88-9bb0-f48721f94cc3" />
 
 # 3. Monte Carlo Pricing
 
