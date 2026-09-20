@@ -1,6 +1,8 @@
 import numpy as np
-from .monte_carlo import simulate_terminal_prices_from_z
+import jax
+import jax.numpy as jnp
 
+from .monte_carlo import simulate_terminal_prices_from_z
 
 def finite_difference_delta(
     S,
@@ -77,3 +79,24 @@ def pathwise_delta(S,K,r,sigma,T,n_paths=100_000,seed=42,):
     )
 
     return delta_estimate
+
+def monte_carlo_price_jax(S,K,r,sigma,T,Z,):
+    """
+    Monte Carlo European call price using JAX.
+
+    Z is supplied externally so that the random numbers
+    remain fixed during differentiation.
+    """
+
+    drift = (r - 0.5 * sigma**2) * T
+    diffusion = sigma * jnp.sqrt(T) * Z
+
+    ST = S * jnp.exp(drift + diffusion)
+
+    payoff = jnp.maximum(ST - K, 0.0)
+
+    discount = jnp.exp(-r * T)
+
+    price = discount * jnp.mean(payoff)
+
+    return price
