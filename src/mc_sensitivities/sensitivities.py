@@ -43,3 +43,24 @@ def finite_difference_delta(
         "forward": (price_up - price_mid) / h,
         "backward": (price_mid - price_down) / h,
     }
+
+
+def pathwise_delta(S, K, r, sigma, T, n_paths=100_000, seed=42):
+    """
+    Estimate Delta using the pathwise method.
+    """
+
+    rng = np.random.default_rng(seed)
+    Z = rng.standard_normal(n_paths)
+
+    ST = simulate_terminal_prices_from_z(S, r, sigma, T, Z)
+    payoff = np.maximum(ST - K, 0)
+
+    # Pathwise delta: 1 if ST > K else 0
+    pathwise_delta_values = (ST > K).astype(float)
+
+    discount = np.exp(-r * T)
+    price = discount * np.mean(payoff)
+    delta_estimate = discount * np.mean(pathwise_delta_values)
+
+    return delta_estimate
