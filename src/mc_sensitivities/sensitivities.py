@@ -100,3 +100,20 @@ def monte_carlo_price_jax(S,K,r,sigma,T,Z,):
     price = discount * jnp.mean(payoff)
 
     return price
+
+def ad_delta(S,K,r,sigma,T,n_paths=100_000,seed=42,):
+    """
+    Estimate call Delta using algorithmic differentiation.
+    """
+
+    rng = np.random.default_rng(seed)
+
+    Z = rng.standard_normal(n_paths)
+
+    Z = jnp.asarray(Z)
+
+    price_function = lambda S: monte_carlo_price_jax(S,K,r,sigma,T,Z,)
+
+    delta = jax.grad(price_function)(S)
+
+    return float(delta)

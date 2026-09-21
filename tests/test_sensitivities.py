@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.mc_sensitivities.sensitivities import pathwise_delta
+from src.mc_sensitivities.sensitivities import ( pathwise_delta,ad_delta,finite_difference_delta)
 
 
 S = 100
