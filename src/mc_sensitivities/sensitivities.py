@@ -4,6 +4,7 @@ import jax.numpy as jnp
 
 from .monte_carlo import simulate_terminal_prices_from_z
 
+
 def finite_difference_delta(
     S,
     K,
@@ -24,36 +25,54 @@ def finite_difference_delta(
     rng = np.random.default_rng(seed)
     Z = rng.standard_normal(n_paths)
 
-    # Terminal prices for S+h, S, S-h
-    ST_up = simulate_terminal_prices_from_z(S + h, r, sigma, T, Z)
-    ST_mid = simulate_terminal_prices_from_z(S,     r, sigma, T, Z)
-    ST_down = simulate_terminal_prices_from_z(S - h, r, sigma, T, Z)
+    # Terminal prices for S+h, S, and S-h
+    ST_up = simulate_terminal_prices_from_z(
+        S + h, r, sigma, T, Z
+    )
+
+    ST_mid = simulate_terminal_prices_from_z(
+        S, r, sigma, T, Z
+    )
+
+    ST_down = simulate_terminal_prices_from_z(
+        S - h, r, sigma, T, Z
+    )
 
     # Payoffs
     payoff_up = np.maximum(ST_up - K, 0)
     payoff_mid = np.maximum(ST_mid - K, 0)
     payoff_down = np.maximum(ST_down - K, 0)
 
+    # Discount factor
     discount = np.exp(-r * T)
 
+    # Monte Carlo prices
     price_up = discount * np.mean(payoff_up)
     price_mid = discount * np.mean(payoff_mid)
     price_down = discount * np.mean(payoff_down)
 
-    return {
-        "central": (price_up - price_down) / (2 * h),
-        "forward": (price_up - price_mid) / h,
-        "backward": (price_mid - price_down) / h,
-    }
+    # Finite-difference estimates
+    central_delta = (price_up - price_down) / (2 * h)
+    forward_delta = (price_up - price_mid) / h
+    backward_delta = (price_mid - price_down) / h
+
+    return central_delta, forward_delta, backward_delta
 
 
-def pathwise_delta(S,K,r,sigma,T,n_paths=100_000,seed=42,):
+def pathwise_delta(
+    S,
+    K,
+    r,
+    sigma,
+    T,
+    n_paths=100_000,
+    seed=42,
+):
     """
     Estimate call Delta using the pathwise method.
     """
 
     rng = np.random.default_rng(seed)
-
     Z = rng.standard_normal(n_paths)
 
     ST = simulate_terminal_prices_from_z(
@@ -64,11 +83,11 @@ def pathwise_delta(S,K,r,sigma,T,n_paths=100_000,seed=42,):
         Z,
     )
 
-    # Indicator: 1 if the option finishes in-the-money, 0 otherwise
+    # Indicator: 1 if the option finishes in-the-money
     indicator = (ST > K).astype(float)
 
     # Pathwise derivative:
-    # dH/dST * dST/dS
+    # dH/dS_T * dS_T/dS
     pathwise_delta_values = indicator * (ST / S)
 
     discount = np.exp(-r * T)
@@ -80,7 +99,15 @@ def pathwise_delta(S,K,r,sigma,T,n_paths=100_000,seed=42,):
 
     return delta_estimate
 
-def monte_carlo_price_jax(S,K,r,sigma,T,Z,):
+
+def monte_carlo_price_jax(
+    S,
+    K,
+    r,
+    sigma,
+    T,
+    Z,
+):
     """
     Monte Carlo European call price using JAX.
 
@@ -101,7 +128,16 @@ def monte_carlo_price_jax(S,K,r,sigma,T,Z,):
 
     return price
 
-def ad_delta(S,K,r,sigma,T,n_paths=100_000,seed=42,):
+
+def ad_delta(
+    S,
+    K,
+    r,
+    sigma,
+    T,
+    n_paths=100_000,
+    seed=42,
+):
     """
     Estimate call Delta using algorithmic differentiation.
     """
@@ -109,10 +145,17 @@ def ad_delta(S,K,r,sigma,T,n_paths=100_000,seed=42,):
     rng = np.random.default_rng(seed)
 
     Z = rng.standard_normal(n_paths)
-
     Z = jnp.asarray(Z)
 
-    price_function = lambda S: monte_carlo_price_jax(S,K,r,sigma,T,Z,)
+    def price_function(S):
+        return monte_carlo_price_jax(
+            S,
+            K,
+            r,
+            sigma,
+            T,
+            Z,
+        )
 
     delta = jax.grad(price_function)(S)
 
