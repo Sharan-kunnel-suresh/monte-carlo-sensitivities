@@ -524,3 +524,5 @@ The Monte Carlo pricing calculation can be represented as a computational graph:
                   ▼
                Price
 ```
+
+# 9. Delta Comparison method
